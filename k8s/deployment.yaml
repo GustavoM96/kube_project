@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: train-record-api
+
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 20%
+      maxUnavailable: 10%
+  selector:
+    matchLabels:
+      app: train-record-api
+  template:
+    metadata:
+      labels:
+        app: train-record-api
+    spec:
+      containers:
+        - name: train-record-api
+          image: gustavom96/train-record:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: app-dotnet-configmap
+            - secretRef:
+                name: app-dotnet-secrets
+          # env:
+          #   - name: APP
+          #     valuefrom:
+          #       configmapkeyref:
+          #         name: app-ts
+          #         key: app-name
+          #   - name: API_KEY
+          #     valuefrom:
+          #       secretkeyref:
+          #         name: app-ts-secrets
+          #         key: api-key
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

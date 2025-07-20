@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: app-dotnet-configmap
+data:
+  APP: train-record
