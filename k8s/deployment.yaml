@@ -5,7 +5,7 @@ metadata:
   name: train-record-api
 
 spec:
-  replicas: 3
+  replicas: 12
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: train-record-api
-          image: gustavom96/train-record:latest
+          image: gustavom96/train-record:0bece08
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -41,6 +41,32 @@ spec:
           #         key: api-key
           ports:
             - containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /Startup
+              port: 8080
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+            periodSeconds: 15
+            initialDelaySeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /Liveness #/Readiness when the DB will be healthy, replace it
+              port: 8080
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+            periodSeconds: 5
+            initialDelaySeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /Liveness
+              port: 8080
+            failureThreshold: 2
+            successThreshold: 1
+            periodSeconds: 5
+            initialDelaySeconds: 2
           resources:
             requests:
               cpu: 100m
